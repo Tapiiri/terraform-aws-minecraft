@@ -25,7 +25,7 @@ variable "bucket_name" {
 variable "bucket_force_destroy" {
   description = "A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. This will destroy your minecraft world!"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "bucket_object_versioning" {
@@ -120,7 +120,7 @@ variable "ami" {
 variable "instance_type" {
   description = "EC2 instance type/size - the default is not part of free tier!"
   type        = string
-  default     = "t3.medium"
+  default     = "t3.small"
 }
 
 variable "allowed_cidrs" {
