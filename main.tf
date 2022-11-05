@@ -9,6 +9,10 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = "eu-north-1"
+}
+
 // This module creates a single EC2 instance for running a Minecraft server
 
 // Default network
