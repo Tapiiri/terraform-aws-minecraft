@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "tf-remote-state20221105094239446500000002"
-    key            = "neosim/terraform.tfstate"
+    #key            = "neosim/terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
     kms_key_id     = "6d4419e3-c651-494c-affa-38d4e3c0c4c7"
