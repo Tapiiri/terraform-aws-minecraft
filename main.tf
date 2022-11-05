@@ -1,3 +1,21 @@
+terraform {
+  backend "s3" {
+    bucket = "tf-remote-state20221105094239446500000002"
+    # key            = "USE THE COMMAND IN tf_init.zsh TO SET THE KEY FOR THE ENV"
+    region         = "eu-north-1"
+    encrypt        = true
+    kms_key_id     = "6d4419e3-c651-494c-affa-38d4e3c0c4c7"
+    dynamodb_table = "tf-remote-state-lock"
+  }
+   
+  required_providers {
+    hetznerdns = {
+      source = "timohirt/hetznerdns"
+      version = "2.1.0"
+    }
+  }
+}
+
 // This module creates a single EC2 instance for running a Minecraft server
 
 // Default network
