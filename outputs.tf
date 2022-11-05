@@ -24,6 +24,7 @@ output "public_key" {
 
 output "private_key" {
   value = tls_private_key.ec2_ssh.*.private_key_pem
+  sensitive = true
 }
 
 resource "local_file" "private_key" {
@@ -38,8 +39,8 @@ resource "local_file" "private_key" {
 output "zzz_ec2_ssh" {
   value = length(var.key_name) > 0 ? "" : <<EOT
 
-Ubuntu: ssh -i ${path.module}/ec2-private-key.pem ubuntu@${module.ec2_minecraft.public_ip[0]}
-Amazon Linux: ssh -i ${path.module}/ec2-private-key.pem ec2-user@${module.ec2_minecraft.public_ip[0]}
+Ubuntu: ssh -i ${path.module}/ec2-private-key.pem ubuntu@${module.ec2_minecraft.public_ip}
+Amazon Linux: ssh -i ${path.module}/ec2-private-key.pem ec2-user@${module.ec2_minecraft.public_ip}
 
 EOT
 
@@ -50,5 +51,5 @@ output "ec2_instance_profile" {
 }
 
 output "minecraft_server" {
-  value = "${module.ec2_minecraft[0].public_ip}:${var.mc_port}"
+  value = "${module.ec2_minecraft.public_ip}:${var.mc_port}"
 }

@@ -1,18 +1,11 @@
 terraform {
   backend "s3" {
     bucket = "tf-remote-state20221105094239446500000002"
-    # key            = "USE THE COMMAND IN tf_init.zsh TO SET THE KEY FOR THE ENV"
+    key            = "neosim/terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
     kms_key_id     = "6d4419e3-c651-494c-affa-38d4e3c0c4c7"
     dynamodb_table = "tf-remote-state-lock"
-  }
-   
-  required_providers {
-    hetznerdns = {
-      source = "timohirt/hetznerdns"
-      version = "2.1.0"
-    }
   }
 }
 
@@ -229,7 +222,9 @@ locals {
 
 // EC2 instance for the server - tune instance_type to fit your performance and budget requirements
 module "ec2_minecraft" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=master"
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 3.0"
+  #source = "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=master"
   name   = "${var.name}-public"
 
   # instance
@@ -241,8 +236,10 @@ module "ec2_minecraft" {
 
   # network
   subnet_id                   = local.subnet_id
-  vpc_security_group_ids      = [ module.ec2_security_group.this_security_group_id ]
+  vpc_security_group_ids      = [ module.ec2_security_group.security_group_id ]
   associate_public_ip_address = var.associate_public_ip_address
+
+  monitoring             = true
 
   tags = module.label.tags
 }
