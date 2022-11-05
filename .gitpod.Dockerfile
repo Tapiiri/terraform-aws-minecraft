@@ -1,7 +1,7 @@
 FROM jsii/superchain:1-buster-slim-node14
 
 ARG AWS_CLI_V2_URL='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'
-ARG TERRAFORM_URL='https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_amd64.zip'
+ARG TERRAFORM_URL='https://releases.hashicorp.com/terraform/1.3.4/terraform_1.3.4_linux_amd64.zip'
 ARG SESSION_MANAGER_PLUGIN='https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb'
 
 
