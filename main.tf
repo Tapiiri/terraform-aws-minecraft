@@ -33,7 +33,7 @@ locals {
 
 // Keep labels, tags consistent
 module "label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=master"
+  source     = "cloudposse/label/null"
 
   namespace   = var.namespace
   stage       = var.environment
@@ -179,7 +179,7 @@ data "template_file" "user_data" {
 
 // Security group for our instance - allows SSH and minecraft 
 module "ec2_security_group" {
-  source = "git@github.com:terraform-aws-modules/terraform-aws-security-group.git?ref=master"
+  source = "terraform-aws-modules/security-group/aws"
 
   name        = "${var.name}-ec2"
   description = "Allow SSH and TCP ${var.mc_port}"
