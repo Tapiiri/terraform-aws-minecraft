@@ -1,0 +1,29 @@
+name: Deploy Minecraft worlds
+
+on: 
+  push:
+    paths:
+      - worlds/**
+        
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment }}
+  tf_actions_working_dir: .
+
+jobs:
+  terraform_apply:
+    name: Deploy Minecraft Environment
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.tf_actions_working_dir }}
+    steps:
+    - name: Deploy worlds to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --delete
+      env:
+        AWS_S3_BUCKET: neosim-minecraft-connections-worlds
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: eu-north-1
+        SOURCE_DIR: "worlds"
