@@ -1,0 +1,14 @@
+github:
+  prebuilds:
+    pullRequestsFromForks: true
+    addComment: true
+    
+image: 
+  file: .gitpod.Dockerfile
+tasks:
+  - init: ${GITPOD_REPO_ROOT}/utils/init-script.sh
+  - command: ${GITPOD_REPO_ROOT}/utils/aws-sso-setup
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
