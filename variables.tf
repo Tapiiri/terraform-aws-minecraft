@@ -44,7 +44,7 @@ variable "name" {
 variable "namespace" {
   description = "Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp'"
   type        = string
-  default     = "games"
+  default     = "simulac"
 }
 
 variable "environment" {
