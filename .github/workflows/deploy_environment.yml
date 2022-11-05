@@ -1,4 +1,4 @@
-name: Deploy Page on Workflow Dispatch
+name: Deploy Minecraft Environment on Workflow Dispatch
 
 on: 
   workflow_dispatch:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   terraform_apply:
-    name: Deploy Page infrastructure
+    name: Deploy Minecraft Environment
     runs-on: ubuntu-latest
     defaults:
       run:
