@@ -248,7 +248,7 @@ module "ec2_minecraft" {
   tags = module.label.tags
 }
 
-resource "local_file" "" {
+resource "local_file" "output" {
     content  = "${module.ec2_minecraft.public_ip}:${var.mc_port}"
     filename = "output.json"
 }
