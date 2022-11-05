@@ -52,10 +52,11 @@ jobs:
         TF_VAR_environment: ${{ env.ENVIRONMENT }}
 
     - name: Terraform output
-      id: init
+      id: output
       run: terraform output -json > output-{{ env.ENVIRONMENT }}.json
 
     - name: Archive code coverage results
+      id: artifact
       uses: actions/upload-artifact@v3
       with:
         name: output-{{ env.ENVIRONMENT }}
