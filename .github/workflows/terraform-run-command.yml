@@ -1,23 +1,24 @@
-name: Deploy Page on Workflow Dispatch
+name: Run Terraform Command
 
-on: 
+on:
   workflow_dispatch:
     inputs:
+      command:
+        description: 'Command to run'     
+        required: true
       environment:
-        description: 'Name of the environment to deploy'     
+        description: 'Environment to run against'
         required: true
-      type:
-        description: 'Type of the environment to deploy'     
-        required: true
-        default: "default"
-        
+        default: production
+
 env:
-  ENVIRONMENT: ${{ github.event.inputs.environment }}
+  ENVIRONMENT: ${{ inputs.environment }}
+  key_prefix: "neosim"
   tf_actions_working_dir: terraform
 
 jobs:
   terraform_apply:
-    name: Deploy Page infrastructure
+    name: Run Terraform command
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,7 +36,7 @@ jobs:
       id: init
       run: terraform init
       env:
-        TF_CLI_ARGS_init: -backend-config="key=neosim/${{ env.ENVIRONMENT }}/terraform.tfstate" 
+        TF_CLI_ARGS_init: -backend-config="${{ env.key_prefix }}/${{ env.ENVIRONMENT }}/terraform.tfstate" 
         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -43,20 +44,10 @@ jobs:
       id: validate
       run: terraform validate -no-color
 
-    - name: Terraform Apply
+    - name: Terraform Command
       id: apply
-      run: terraform apply -auto-approve -lock-timeout=5m
+      run: terraform ${{ inputs.command }}
       env:
         AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         TF_VAR_environment: ${{ env.ENVIRONMENT }}
-
-    - name: Terraform output
-      id: init
-      run: terraform output -json > output-{{ env.ENVIRONMENT }}.json
-
-    - name: Archive code coverage results
-      uses: actions/upload-artifact@v3
-      with:
-        name: output-{{ env.ENVIRONMENT }}
-        path: output-{{ env.ENVIRONMENT }}.json
