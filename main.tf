@@ -216,7 +216,7 @@ resource "tls_private_key" "ec2_ssh" {
 resource "aws_key_pair" "ec2_ssh" {
   count = 1 # length(var.key_name) > 0 ? 0 : 1
 
-  key_name   = "${var.name}-ec2-ssh-key"
+  key_name   = var.key_name
   public_key = tls_private_key.ec2_ssh[0].public_key_openssh
 }
 
