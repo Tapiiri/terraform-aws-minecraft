@@ -13,7 +13,7 @@ on:
 
 env:
   ENVIRONMENT: ${{ inputs.environment }}
-  tf_actions_working_dir: terraform
+  tf_actions_working_dir: .
   key_prefix: "neosim"
 
 

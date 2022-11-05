@@ -14,7 +14,7 @@ on:
 env:
   ENVIRONMENT: ${{ inputs.environment }}
   key_prefix: "neosim"
-  tf_actions_working_dir: terraform
+  tf_actions_working_dir: .
 
 jobs:
   terraform_apply:
