@@ -172,7 +172,7 @@ data "template_file" "user_data" {
 
   vars = {
     mc_root        = var.mc_root
-    mc_bucket      = local.bucket
+    mc_bucket      = "${local.bucket}/${var.world_folder}"
     mc_backup_freq = var.mc_backup_freq
     mc_version     = var.mc_version
     mc_type        = var.mc_type   

@@ -22,6 +22,12 @@ variable "bucket_name" {
   default     = ""
 }
 
+variable "world_folder" {
+    description = "Folder in the bucket to find the world in "
+  type        = string
+  default     = ""
+}
+
 variable "bucket_force_destroy" {
   description = "A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. This will destroy your minecraft world!"
   type        = bool

@@ -7,9 +7,8 @@ on:
         description: 'Name of the environment to deploy'     
         required: true
       type:
-        description: 'Type of the environment to deploy'     
-        required: true
-        default: "default"
+        description: 'Type of the environment to deploy'
+        default: ""
         
 env:
   ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -51,6 +50,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         TF_VAR_environment: ${{ env.ENVIRONMENT }}
         TF_VAR_key_name: minecraft-${{ env.ENVIRONMENT }}-ec2-ssh-key
+        TF_VAR_bucket: neosim-minecraft-connections-output
+        TF_VAR_world_folder: ${{ github.event.inputs.type }}
     - name: Create folder for Terraform output
       id: mkdir
       run: mkdir output
