@@ -3,6 +3,12 @@
 # Install, configure and start a new Minecraft server
 # This supports Ubuntu and Amazon Linux 2 flavors of Linux (maybe/probably others but not tested).
 
+# The only way I can figure out to install a new enough of a version on the machine...! Nothing else seemed to work.
+sudo apt install unzip zip
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install java 21.0.3-amzn
+
 set -e
 
 # Determine linux distro
