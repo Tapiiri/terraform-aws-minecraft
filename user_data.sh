@@ -4,10 +4,6 @@
 # This supports Ubuntu and Amazon Linux 2 flavors of Linux (maybe/probably others but not tested).
 
 # The only way I can figure out to install a new enough of a version on the machine...! Nothing else seemed to work.
-sudo apt install unzip zip
-curl -s "https://get.sdkman.io" | bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-sdk install java 21.0.3-amzn
 
 set -e
 
@@ -46,6 +42,10 @@ fi
 ubuntu_linux_setup() {
   export SSH_USER="ubuntu"
   export DEBIAN_FRONTEND=noninteractive
+  sudo apt install unzip zip
+  curl -s "https://get.sdkman.io" | bash
+  source "$HOME/.sdkman/bin/sdkman-init.sh"
+  sdk install java 21.0.3-amzn
   /usr/bin/apt-get update
   /usr/bin/apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" openjdk-17-jdk wget awscli jq
   /bin/cat <<"__UPG__" > /etc/apt/apt.conf.d/10periodic
