@@ -170,10 +170,8 @@ EOF
 }
 
 // Script to configure the server - this is where most of the magic occurs!
-data "template_file" "user_data" {
-  template = file("${path.module}/user_data.sh")
-
-  vars = {
+locals {
+  user_data_vars = {
     mc_root        = var.mc_root
     mc_bucket      = "${local.bucket}/${var.world_folder}"
     mc_backup_freq = var.mc_backup_freq
@@ -182,6 +180,10 @@ data "template_file" "user_data" {
     java_mx_mem    = var.java_mx_mem
     java_ms_mem    = var.java_ms_mem
   }
+}
+
+data "template_file" "user_data" {
+  template = templatefile("${path.module}/user_data.sh.tftpl", local.user_data_vars)
 }
 
 // Security group for our instance - allows SSH and minecraft 
