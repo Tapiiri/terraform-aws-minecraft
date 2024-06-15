@@ -23,7 +23,7 @@ jobs:
         working-directory: ${{ env.tf_actions_working_dir }}
     steps:
     - uses: actions/checkout@v2
-    - uses: hashicorp/setup-terraform@v2
+    - uses: hashicorp/setup-terraform@v3.1.1
 
     - name: Terraform fmt
       id: fmt
