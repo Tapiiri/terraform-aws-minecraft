@@ -1,26 +1,30 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 
 const triggerGitHubWorkflow = async (environment: string, type: string) => {
-  const url = `https://api.github.com/repos/tapiiri/terraform-aws-minecraft/dispatches`;
+  const url = `https://api.github.com/repos/tapiiri/terraform-aws-minecraft/actions/workflows/deploy_environment.yml/dispatches`;
   const body = {
-    event_type: 'deploy', // This is your custom event type, it can be anything
-    client_payload: {
+    ref: 'master',
+    inputs: {
       environment: environment,
       type: type,
     },
   };
-
+  console.log(
+    'Triggering GitHub workflow:',
+    body,
+    process.env.NEXT_PUBLIC_GITHUB_TOKEN,
+  );
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
       Accept: 'application/vnd.github.v3+json',
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, // Ensure this token has repo permissions
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`, // Ensure this token has repo permissions
       'Content-Type': 'application/json',
     },
   });
@@ -33,8 +37,39 @@ const triggerGitHubWorkflow = async (environment: string, type: string) => {
 };
 
 export default function Home() {
+  const [polling, setPolling] = useState<boolean>(false);
+  const [type, setType] = useState<string>('');
+  const [environment, setEnvironment] = useState<string>('');
   const [files, setFiles] = useState<File[]>([]);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+
+  const [deploymentDetails, setDeploymentDetails] = useState(null);
+
+  // Polling function
+  useEffect(() => {
+    if (polling) {
+      const interval = setInterval(async () => {
+        try {
+          const details = await fetch(
+            `/api/upload?environment=${environment}`,
+          ).then((res) => {
+            console.log('Response:', res);
+            return res.json();
+          });
+          console.log('Details:', details);
+          if (details) {
+            setDeploymentDetails(details);
+            clearInterval(interval); // Stop polling once data is fetched
+            setPolling(false);
+          }
+        } catch (error) {
+          console.error('Failed to fetch deployment details', error);
+        }
+      }, 5000); // Poll every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [environment, polling]);
 
   const handleFolderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = event.target.files;
@@ -70,6 +105,9 @@ export default function Home() {
         const resp = await response.json();
         console.log('Response:', resp);
         const [environment, type] = resp;
+        setType(type);
+        setEnvironment(environment);
+        setPolling(true);
         triggerGitHubWorkflow(environment, type)
           .then((data) => console.log('Workflow dispatched successfully', data))
           .catch((error) =>
@@ -114,6 +152,25 @@ export default function Home() {
             Upload Minecraft World
           </Button>
         </div>
+        {!!type && (
+          <div className="w-full max-w-sm">
+            <h2 className="text-lg font-medium text-gray-900">
+              Your world ID is
+            </h2>
+            <p className="mt-2 text-sm text-gray-700">
+              {type} {environment}
+            </p>
+            {deploymentDetails ? (
+              <p className="mt-2 text-sm text-gray-700">
+                Deployment is running at: {deploymentDetails['IP'] || 'Unknown'}
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-gray-700">
+                Deployment is in progress...
+              </p>
+            )}
+          </div>
+        )}
         {/* File List */}
         <div className="max-w-m w-full">
           <h2 className="text-lg font-medium text-gray-900">Files Selected</h2>
