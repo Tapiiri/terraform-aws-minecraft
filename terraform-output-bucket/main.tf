@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket = "tf-remote-state20221105094239446500000002"
+    bucket = "tf-remote-state20240615101729664100000002"
     key            = "neosim/output-bucket/terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
-    kms_key_id     = "6d4419e3-c651-494c-affa-38d4e3c0c4c7"
+    kms_key_id     = "53f98ade-e94a-429c-a51c-57100e21dac9"
     dynamodb_table = "tf-remote-state-lock"
   }
 }
@@ -13,24 +13,49 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-module "s3-output" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+locals {
+  bucket_name = "neosim5-minecraft-connections-output"
+}
 
-  create_bucket = true
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = local.bucket_name
+  acl    = "private"
+}
 
-  bucket = "neosim-minecraft-connections-output"
-  acl    = "public-read"
+resource "aws_iam_user" "s3_user" {
+  name = "s3-user"
+}
 
-  force_destroy = true
+resource "aws_iam_user_policy" "s3_user_policy" {
+  name   = "s3-user-policy"
+  user   = aws_iam_user.s3_user.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl"
+        ]
+        Resource = [
+          "${aws_s3_bucket.my_bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
 
-  versioning = {
-    enabled = false
-  }
+resource "aws_iam_access_key" "s3_user_key" {
+  user = aws_iam_user.s3_user.name
+}
 
-  # S3 bucket-level Public Access Block configuration
-  block_public_acls       = false
-  block_public_policy     = true
-  ignore_public_acls      = false
-  restrict_public_buckets = true
+output "s3_user_access_key" {
+  value = aws_iam_access_key.s3_user_key.id
+  sensitive = true
+}
 
+output "s3_user_secret_key" {
+  value = aws_iam_access_key.s3_user_key.secret
+  sensitive = true
 }

@@ -1,10 +1,10 @@
 terraform {
   backend "s3" {
-    bucket = "tf-remote-state20221105094239446500000002"
+    bucket = "tf-remote-state20240615101729664100000002"
     #key            = "neosim/terraform.tfstate"
     region         = "eu-north-1"
     encrypt        = true
-    kms_key_id     = "6d4419e3-c651-494c-affa-38d4e3c0c4c7"
+    kms_key_id     = "53f98ade-e94a-429c-a51c-57100e21dac9"
     dynamodb_table = "tf-remote-state-lock"
   }
 }
