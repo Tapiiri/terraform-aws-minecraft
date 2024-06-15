@@ -1,18 +1,35 @@
 'use client';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    setFile(selectedFile || null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
+
+  const handleFolderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newFiles = event.target.files;
+    if (!newFiles) return;
+    const filteredFiles = Array.from(newFiles).filter(
+      (file) => !file.name.startsWith('.'),
+    );
+    const fileList = Array.from(filteredFiles); // Convert FileList to Array
+    // You can process the list to group by directory or handle as is
+    fileList.forEach((file) => {
+      console.log(file.webkitRelativePath); // This property shows path within the folder
+    });
+    setFiles(fileList);
   };
 
-  // Function to handle the upload action
   const handleUpload = async () => {
-    if (file) {
+    if (files && files.length > 0) {
       const formData = new FormData();
-      formData.append('file', file);
+      // Append each file to the FormData object
+      Array.from(files).forEach((file) => {
+        formData.append('files', file, file.webkitRelativePath || file.name);
+      });
 
       // API endpoint where you send the file
       const response = await fetch('/api/upload', {
@@ -22,29 +39,69 @@ export default function Home() {
 
       // Handle response here
       if (response.ok) {
+        setUploadStatus('success');
         console.log('File uploaded successfully');
       } else {
+        setUploadStatus('error');
         console.error('Upload failed');
       }
+    } else {
+      console.log('No files to upload');
+      setUploadStatus('error');
     }
   };
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        {/* Existing UI content */}
-      </div>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-8">
+      <div className="w-full max-w-4xl space-y-8">
+        <h1 className="text-center text-3xl font-bold leading-tight text-gray-900">
+          Upload Your Minecraft World
+        </h1>
 
-      {/* File Upload Section */}
-      <div className="upload-container">
-        <input type="file" onChange={handleFileChange} />
-        <button onClick={handleUpload} disabled={!file}>
-          Upload Minecraft World
-        </button>
-      </div>
-
-      <div className="before:bg-gradient-radial after:bg-gradient-conic relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:lg:h-[360px]">
-        {/* Existing UI content */}
+        {/* File Upload Section */}
+        <div className="flex flex-col items-center justify-center">
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="worldfile">Choose a world file</Label>
+            <Input
+              id="worldfile"
+              type="file"
+              webkitdirectory="true"
+              directory="true"
+              mozdirectory="true"
+              multiple
+              onChange={handleFolderChange}
+            />
+          </div>
+          <Button
+            color="primary"
+            onClick={handleUpload}
+            disabled={!files.length}
+            className="mt-4"
+          >
+            Upload Minecraft World
+          </Button>
+        </div>
+        {/* File List */}
+        <div className="max-w-m w-full">
+          <h2 className="text-lg font-medium text-gray-900">Files Selected</h2>
+          <ul className="mt-2 space-y-1">
+            {files.map((file) => (
+              <li key={file.name} className="text-sm text-gray-700">
+                {file.webkitRelativePath}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* Alerts for Feedback */}
+        {uploadStatus === 'success' && (
+          <Alert variant="default" className="mt-4">
+            File uploaded successfully!
+          </Alert>
+        )}
+        {uploadStatus === 'error' && (
+          <Alert variant="destructive" className="mt-4">
+            Upload failed. Please try again.
+          </Alert>
+        )}
       </div>
     </main>
   );
