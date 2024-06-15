@@ -27,18 +27,21 @@ export async function POST(req: NextRequest) {
   }
   console.log('Files:', files);
   try {
-    const response = await Promise.all(
+    await Promise.all(
       files.map(async (file) => {
         console.log('Uploading:', file.name);
         const Body = (await file.arrayBuffer()) as Buffer;
         s3.send(new PutObjectCommand({ Bucket, Key: file.name, Body }));
       }),
     );
-  
-    return NextResponse.json(response);
   }
   catch (uploadError) {
     console.error('Upload Error:', uploadError);
     return new NextResponse('Upload failed', { status: 500 });
   }
+  //enviroment is the base folder name
+  //type is unique random string
+  const environment = files[0].name?.split('/')[0] || '';
+  const type = Math.random().toString(36).substring(7);
+  return NextResponse.json([environment, type]);
 }

@@ -5,6 +5,33 @@ import { Input } from '@/components/ui/input';
 import { Alert } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 
+const triggerGitHubWorkflow = async (environment: string, type: string) => {
+  const url = `https://api.github.com/repos/tapiiri/terraform-aws-minecraft/dispatches`;
+  const body = {
+    event_type: 'deploy', // This is your custom event type, it can be anything
+    client_payload: {
+      environment: environment,
+      type: type,
+    },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      Accept: 'application/vnd.github.v3+json',
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, // Ensure this token has repo permissions
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub API responded with status ${response.status}`);
+  }
+
+  return await response.json();
+};
+
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploadStatus, setUploadStatus] = useState<string>('');
@@ -40,7 +67,14 @@ export default function Home() {
       // Handle response here
       if (response.ok) {
         setUploadStatus('success');
-        console.log('File uploaded successfully');
+        const resp = await response.json();
+        console.log('Response:', resp);
+        const [environment, type] = resp;
+        triggerGitHubWorkflow(environment, type)
+          .then((data) => console.log('Workflow dispatched successfully', data))
+          .catch((error) =>
+            console.error('Failed to dispatch workflow', error),
+          );
       } else {
         setUploadStatus('error');
         console.error('Upload failed');
